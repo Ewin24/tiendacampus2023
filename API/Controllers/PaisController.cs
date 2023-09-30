@@ -22,7 +22,7 @@ public class PaisController : BaseController
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async  Task<ActionResult<IEnumerable<Pais>>> Get()
+    public async Task<ActionResult<IEnumerable<Pais>>> Get()
     {
         var paises = await _unitOfWork.Paises.GetAllAsync();
         return Ok(paises);
@@ -34,7 +34,8 @@ public class PaisController : BaseController
     public async Task<ActionResult<Pais>> Get(int id)
     {
         var pais = await _unitOfWork.Paises.GetByIdAsync(id);
-        if (pais == null){
+        if (pais == null)
+        {
             return NotFound();
         }
         return pais;
@@ -42,27 +43,48 @@ public class PaisController : BaseController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Pais>> Post(Pais pais){
+    public async Task<ActionResult<Pais>> Post(Pais pais)
+    {
         this._unitOfWork.Paises.Add(pais);
         await _unitOfWork.SaveAsync();
         if (pais == null)
         {
             return BadRequest();
         }
-        return CreatedAtAction(nameof(Post),new {id= pais.Id}, pais);
+        return CreatedAtAction(nameof(Post), new { id = pais.Id }, pais);
     }
-     //PUT: api/Productos/4
+    
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Pais>> Put(int id, [FromBody] Pais pais)
     {
-        if(pais == null)
+        if (pais == null)
             return NotFound();
         //var paises = _mapper.Map<Pais>(paisDto);
         _unitOfWork.Paises.Update(pais);
         await _unitOfWork.SaveAsync();
         return pais;
     }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var pais = await _unitOfWork.Paises.GetByIdAsync(id);
+
+        if (pais == null)
+        {
+            return NotFound();
+        }
+
+        _unitOfWork.Paises.Remove(pais);
+        await _unitOfWork.SaveAsync();
+
+        return NoContent();
+    }
+
 }
